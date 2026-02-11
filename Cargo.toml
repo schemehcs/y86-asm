@@ -1,0 +1,11 @@
+[package]
+name = "y86-asm"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+clap = { version = "4.5.57", features = ["derive"] }
+pretty-hex = "0.4.1"
+y86-inst = { path = "../y86-inst" }
+y86-obj = { path = "../y86-obj" }
