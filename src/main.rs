@@ -7,6 +7,9 @@ use std::{
 use y86_inst::{Inst, Location, MemAccess, Reg};
 use y86_obj::{ByteBuf, Object, Segment};
 
+
+/// TODO: 1. add label mapping to the disassembler
+
 #[derive(Parser)]
 #[command(version, about, long_about=None)]
 struct Cli {
@@ -720,7 +723,7 @@ impl<'a> Codegen<'a> {
                             entry = Some(ent);
                         }
                         Quad(data) => {
-                            self.push_u64(*data << 8 | 0xFF);
+                            self.push_u64(*data);
                         }
                     }
                 }
@@ -1128,15 +1131,12 @@ impl<'a> Disasm<'a> {
                         let ra = self.decompile_reg(rai)?;
                         (Stmt::Inst(Inst::Popq(ra)), 2)
                     }
-                    0xFF => {
+                    other => {
+                        let mut num_vec = vec![other];
                         let num_sl = bf.slice(7)?;
-                        let mut num_vec = Vec::from(num_sl);
-                        num_vec.push(0);
+                        num_vec.extend_from_slice(num_sl);
                         let num = u64::from_le_bytes(num_vec[..].try_into()?);
                         (Stmt::Expr(Expr::Quad(num)), 8)
-                    }
-                    other => {
-                        bail!("invalid instruction indicator {}", other);
                     }
                 };
                 cmd_vec.push((addr, stmt));
